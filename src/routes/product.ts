@@ -1,17 +1,16 @@
 import express from 'express'
 import Product from '../models/product'
-
+import authMiddleware from '../middleware/Auth';
 const router = express.Router()
 
-// router.get('/', (_req, res) => {
-//     console.log('ok')
-//     res.send('Fetching data')
-// })
+// TODO: Verificar que el user de la request si es el dueno del producto con request.userId
+// para los endpoints que requieran acceder a un producto creado
+
 
 // Getting all
-router.get('/', async (_req, res) => {
+router.get('/', authMiddleware, async (req: any, res) => {
     try {
-      const products = await Product.find()
+      const products = await Product.find({ownerId: req.userId})
       res.json(products)
     } catch (err : any ) {
       res.status(500).json({ message: err.message })
@@ -19,7 +18,7 @@ router.get('/', async (_req, res) => {
   })
 
 // Creating one
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   const product = new Product({
     name: req.body.name,
     description: req.body.description,
