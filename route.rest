@@ -3,11 +3,16 @@ GET http://localhost:3000/api/product
 ###
 
 POST http://localhost:3000/api/product
+Content-Type: application/json
 
 {
     "name": "iPhone",
     "description": "Celular inteligente",
     "quantity": 4,
     "brand": "Apple",
-    "ownerId": "12",
+    "ownerId": "12"
 }
+
+###
+
+POST

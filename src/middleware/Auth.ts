@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken'
 
 export default (request: any, response: any, next: any) => {
   const authorization = request.get('authorization')
+  
   let token = ''
 
   if (authorization && authorization.toLowerCase().startsWith('bearer')) {

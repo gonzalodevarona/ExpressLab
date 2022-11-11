@@ -17,6 +17,11 @@ router.get('/', authMiddleware, async (req: any, res) => {
     }
   })
 
+// Getting One
+router.get('/:id', [authMiddleware , getProduct], (_req : any, res : any) => {
+  res.json(res.product)
+})
+
 // Creating one
 router.post('/', authMiddleware, async (req, res) => {
   const product = new Product({
@@ -33,5 +38,55 @@ router.post('/', authMiddleware, async (req, res) => {
     res.status(400).json({ message: err.message })
   }
 })
+
+// Updating One
+router.patch('/:id', getProduct, async (req, res : any) => {
+  if (req.body.name != null) {
+    res.product.name = req.body.name
+  }
+  if (req.body.description != null) {
+    res.product.description = req.body.description
+  }
+  if (req.body.quantity != null) {
+    res.product.quantity = req.body.quantity
+  }
+  if (req.body.brand != null) {
+    res.product.brand = req.body.brand
+  }
+  if (req.body.ownerId != null) {
+    res.product.ownerId = req.body.ownerId
+  }
+  try {
+    const updatedProduct = await res.product.save()
+    res.json(updatedProduct)
+  } catch (err : any) {
+    res.status(400).json({ message: err.message })
+  }
+})
+
+// Deleting One
+router.delete('/:id', getProduct, async (_req, res  : any) => {
+  try {
+    await res.product.remove()
+    res.json({ message: 'Deleted Product' })
+  } catch (err  : any) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+async function getProduct(req : any, res : any, next : any) {
+  let product
+  try {
+    product = await Product.findById(req.params.id)
+    if (product == null) {
+      return res.status(404).json({ message: 'Cannot find product' })
+    }
+  } catch (err  : any) {
+    return res.status(500).json({ message: err.message })
+  }
+
+  res.product = product
+  next()
+}
 
 export default router
