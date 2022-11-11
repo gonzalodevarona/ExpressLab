@@ -57,4 +57,20 @@ loginRouter.post('/login', async (request, response) => {
   })
 })
 
+loginRouter.delete('/:id', [authMiddleware, getUser], async (req : any, res  : any) => {
+
+  if(res.user._id != req.userId ){
+    res.status(403).json({ message: "this is not your user therefore you cannot delete it" })
+    return
+  }
+
+  try {
+    await res.user.remove()
+    res.json({ message: 'Deleted User' })
+  } catch (err  : any) {
+    res.status(500).json({ message: err.message })
+  }
+  
+})
+
 export default loginRouter;

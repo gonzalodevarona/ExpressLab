@@ -75,7 +75,7 @@ router.patch('/:id', [authMiddleware, getProduct], async (req : any, res : any) 
 router.delete('/:id', [authMiddleware, getProduct], async (req : any, res  : any) => {
 
   if(res.product.ownerId != req.userId ){
-    res.status(403).json({ message: "this is not your product therefore you cannot edit it" })
+    res.status(403).json({ message: "this is not your product therefore you cannot delete it" })
     return
   }
 
