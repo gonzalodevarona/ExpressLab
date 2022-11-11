@@ -15,7 +15,7 @@ const app = express();
 
 app.use(express.json()) //middleware que transforma la req.body a json
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use('/api/product', productRoutes)
 app.use('/api/auth', loginRoutes)
