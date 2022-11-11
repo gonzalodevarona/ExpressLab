@@ -66,8 +66,6 @@ router.patch('/:id', [authMiddleware, getProduct], async (req : any, res : any) 
   } catch (err : any) {
     res.status(400).json({ message: err.message })
   }
-  
-    
 
 })
 

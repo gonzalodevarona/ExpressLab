@@ -1,14 +1,17 @@
 import jwt from 'jsonwebtoken'
 import express from 'express'
 import User from '../models/User'
-
+import authMiddleware from '../middleware/Auth';
 
 const loginRouter = express.Router()
 
 // Register user
 loginRouter.post('/register', async (request, response) => {
-  const { body } = request
-  const { username, name, password } = body
+  const { username, name, email, identification, password, active } = request.body
+
+  if ([name, email, identification, password, active].includes(undefined)) {
+    response.status(400).json({ message: "Missing arguments" })
+  }
 
   const user = new User({
     username,
@@ -55,6 +58,34 @@ loginRouter.post('/login', async (request, response) => {
     username: user.username,
     token
   })
+})
+
+loginRouter.patch('/', authMiddleware, async (req: any, res: any) => {
+
+  const { name, email, identification, active } = req.body
+
+  if ([name, email, identification, active].includes(undefined)) {
+    res.status(400).json({ message: "Missing arguments" })
+  }
+  
+  try {
+    const updatedProduct = await User.findByIdAndUpdate(req.userId, {...req.body} );
+    res.json(updatedProduct)
+  } catch (err: any) {
+    res.status(400).json({ message: err.message })
+  }
+
+})
+
+loginRouter.get('/', authMiddleware, async (req: any, res: any) => {
+
+  try {
+    const updatedProduct = await User.findById(req.userId);
+    res.json(updatedProduct)
+  } catch (err: any) {
+    res.status(400).json({ message: err.message })
+  }
+
 })
 
 export default loginRouter;
