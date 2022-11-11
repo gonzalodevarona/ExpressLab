@@ -23,13 +23,13 @@ router.get('/:id', [authMiddleware , getProduct], (_req : any, res : any) => {
 })
 
 // Creating one
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, async (req : any, res) => {
   const product = new Product({
     name: req.body.name,
     description: req.body.description,
     quantity: req.body.quantity,
     brand: req.body.brand,
-    ownerId: req.body.ownerId,
+    ownerId: req.userId,
   })
   try {
     const newProduct = await product.save()
@@ -40,7 +40,13 @@ router.post('/', authMiddleware, async (req, res) => {
 })
 
 // Updating One
-router.patch('/:id', getProduct, async (req, res : any) => {
+router.patch('/:id', [authMiddleware, getProduct], async (req : any, res : any) => {
+  
+  if(res.product.ownerId != req.userId ){
+    res.status(403).json({ message: "this is not your product therefore you cannot edit it" })
+    return
+  }
+    
   if (req.body.name != null) {
     res.product.name = req.body.name
   }
@@ -53,25 +59,33 @@ router.patch('/:id', getProduct, async (req, res : any) => {
   if (req.body.brand != null) {
     res.product.brand = req.body.brand
   }
-  if (req.body.ownerId != null) {
-    res.product.ownerId = req.body.ownerId
-  }
+  
   try {
     const updatedProduct = await res.product.save()
     res.json(updatedProduct)
   } catch (err : any) {
     res.status(400).json({ message: err.message })
   }
+  
+    
+
 })
 
 // Deleting One
-router.delete('/:id', getProduct, async (_req, res  : any) => {
+router.delete('/:id', [authMiddleware, getProduct], async (req : any, res  : any) => {
+
+  if(res.product.ownerId != req.userId ){
+    res.status(403).json({ message: "this is not your product therefore you cannot edit it" })
+    return
+  }
+
   try {
     await res.product.remove()
     res.json({ message: 'Deleted Product' })
   } catch (err  : any) {
     res.status(500).json({ message: err.message })
   }
+  
 })
 
 async function getProduct(req : any, res : any, next : any) {
