@@ -60,6 +60,20 @@ loginRouter.post('/login', async (request, response) => {
   })
 })
 
+loginRouter.delete('/', authMiddleware, async (req: any, res: any) => {
+
+  try {
+    const removedUser = await User.findOneAndRemove(req.userId);
+    res.json({
+      message: 'Deleted User',
+      ...removedUser
+    })
+  } catch (err: any) {
+    res.status(500).json({ message: err.message })
+  }
+
+})
+
 loginRouter.patch('/', authMiddleware, async (req: any, res: any) => {
 
   const { name, email, identification, active } = req.body
@@ -67,14 +81,13 @@ loginRouter.patch('/', authMiddleware, async (req: any, res: any) => {
   if ([name, email, identification, active].includes(undefined)) {
     res.status(400).json({ message: "Missing arguments" })
   }
-  
+
   try {
-    const updatedProduct = await User.findByIdAndUpdate(req.userId, {...req.body} );
+    const updatedProduct = await User.findByIdAndUpdate(req.userId, { ...req.body });
     res.json(updatedProduct)
   } catch (err: any) {
     res.status(400).json({ message: err.message })
   }
-
 })
 
 loginRouter.get('/', authMiddleware, async (req: any, res: any) => {
